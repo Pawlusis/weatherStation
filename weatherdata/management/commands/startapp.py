@@ -9,4 +9,4 @@ class Command(BaseCommand):
 
         subprocess.Popen(["python", os.path.join(os.path.dirname(__file__), "../../consumers.py")])
 
-        os.system('python manage.py runserver')
+        os.system('python manage.py runserver 0.0.0.0:8000')
