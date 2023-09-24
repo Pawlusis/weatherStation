@@ -1,11 +1,10 @@
 import os
-import sys
-import django
-import paho.mqtt.client as mqtt
-from weatherdata.models import WeatherData
 import time
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+import django
+import paho.mqtt.client as mqtt
+
+from weatherdata.models import WeatherData
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'weatherstation.settings')
 django.setup()
@@ -39,5 +38,5 @@ if __name__ == "__main__":
     client.on_connect = on_connect
     client.on_message = on_message
 
-    client.connect("192.168.1.27", 1883, 60)
+    client.connect("localhost", 1883, 60)
     client.loop_forever()
