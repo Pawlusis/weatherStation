@@ -1,10 +1,14 @@
 import os
+import sys
 import time
 
 import django
 import paho.mqtt.client as mqtt
 
 from weatherdata.models import WeatherData
+
+sys.path.append('/home/pi/weatherStation/')
+
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'weatherstation.settings')
 django.setup()
