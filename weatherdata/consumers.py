@@ -1,18 +1,40 @@
+import os
+import django
 import paho.mqtt.client as mqtt
-from .models import WeatherData
+from weatherdata.models import WeatherData
+import time
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'weatherstation.settings')
+django.setup()
+
+temperature_data = None
+humidity_data = None
+
 
 def on_connect(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
-    client.subscribe("weather_station")
+    print("Connected with result code " + str(rc))
+    client.subscribe("weather_station/temperature")
+    client.subscribe("weather_station/humidity")
+
 
 def on_message(client, userdata, msg):
-    data = msg.payload.decode('utf-8').split(',')
-    temperature, humidity, connection_status = data
-    WeatherData.objects.create(temperature=temperature, humidity=humidity, connection_status=connection_status)
+    global temperature_data, humidity_data
+    if msg.topic == "weather_station/temperature":
+        temperature_data = float(msg.payload)
+    elif msg.topic == "weather_station/humidity":
+        humidity_data = float(msg.payload)
 
-client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
+    if temperature_data is not None and humidity_data is not None:
+        weather_entry = WeatherData(temperature=temperature_data, humidity=humidity_data)
+        weather_entry.save()
+        temperature_data = None
+        humidity_data = None
 
-client.connect("192.168.1.23", 1883, 60)
-client.loop_forever()
+if __name__ == "__main__":
+    time.sleep(10)
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.on_message = on_message
+
+    client.connect("192.168.1.27", 1883, 60)
+    client.loop_forever()
