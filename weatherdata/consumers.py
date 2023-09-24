@@ -1,17 +1,16 @@
-import os
 import sys
-import time
-
-import django
-import paho.mqtt.client as mqtt
-
-from weatherdata.models import WeatherData
 
 sys.path.append('/home/pi/weatherStation/')
 
+import os
+import django
+import paho.mqtt.client as mqtt
+import time
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'weatherstation.settings')
 django.setup()
+
+from weatherdata.models import WeatherData
 
 temperature_data = None
 humidity_data = None
@@ -35,6 +34,7 @@ def on_message(client, userdata, msg):
         weather_entry.save()
         temperature_data = None
         humidity_data = None
+
 
 if __name__ == "__main__":
     time.sleep(10)
