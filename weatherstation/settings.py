@@ -27,7 +27,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'fallback-secret-key-if-env-var
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.27','localhost','217.96.228.158','0.0.0.0']
+ALLOWED_HOSTS = ['192.168.1.27','localhost','0.0.0.0']
 
 
 # Application definition
