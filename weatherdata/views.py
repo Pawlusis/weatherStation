@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from .models import WeatherData
+import json
+from django.core.serializers import serialize
 
-
-def show_data(request):
+def weather_dashboard(request):
     weather_data = WeatherData.objects.all()
+    data = serialize('json', weather_data)
     context = {
-		'weather_data': weather_data,
-		'current_data': list(weather_data)[-1] if weather_data.exists() else None,
-		}
-    return render(request, 'weatherdata/data.html', context)
+        'weather_data': json.loads(data)
+    }
+    return render(request, 'weatherdata/data1.html', {'weather_data': json.loads(data)})
