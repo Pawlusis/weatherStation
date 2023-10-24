@@ -8,6 +8,7 @@ dash-core-components==2.0.0
 dash-html-components==2.0.0
 dash-table==5.0.0
 Django==4.2.5
+django-chartjs==2.3.0
 django-plotly-dash==2.2.2
 dpd-components==0.1.0
 Flask==2.3.3
