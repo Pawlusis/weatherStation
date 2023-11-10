@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Pressure Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@^3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@^2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@^1"></script>
+    <style>
+        .headerContainer {
+            width: 100%;
+            padding: 20px;
+            overflow: auto;
+            background-color: #6c7ae0;
+        }
+
+        .leftHeader, .rightHeader {
+            float: left;
+            width: 10%;
+            height: 30px;
+            background-color: #6c7ae0;
+            color: white;
+            text-align: center;
+            line-height: 30px;
+        }
+
+        .centerHeader {
+            float: left;
+            width: 80%;
+            height: 30px;
+            background-color: #6c7ae0;
+            color: white;
+            text-align: center;
+            line-height: 30px;
+        }
+
+        .centerHeader h1 {
+            margin: 0;
+            font-size: 1em;
+        }
+
+
+        table.blueTable {
+            border: 1px solid #1C6EA4;
+            background-color: #EEEEEE;
+            width: 100%;
+            text-align: center;
+            border-collapse: collapse;
+        }
+
+        table.blueTable td, table.blueTable th {
+            border: 1px solid #AAAAAA;
+            padding: 3px 2px;
+        }
+
+        table.blueTable tbody td {
+            font-size: 13px;
+        }
+
+        table.blueTable tr:nth-child(even) {
+            background: #D0E4F5;
+        }
+
+        table.blueTable thead {
+            background: #1C6EA4;
+            background: -moz-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+            background: -webkit-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+            background: linear-gradient(to bottom, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+            border-bottom: 2px solid #444444;
+        }
+
+        table.blueTable thead th {
+            font-size: 15px;
+            font-weight: bold;
+            color: #FFFFFF;
+            border-left: 2px solid #D0E4F5;
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="headerContainer">
+    <div class="leftHeader">
+        <a href="/" style="text-decoration: none; color: white">back</a>
+    </div>
+    <div class="centerHeader">
+        <h1>Humidity Dashboard</h1>
+    </div>
+    <div class="rightHeader">
+        <a href="/admin" style="text-decoration: none; color: white">login</a>
+    </div>
+</div>
+
+
+<canvas id="humidityChart" width="400" height="100"></canvas>
+<div>
+    <table class="blueTable" id="weatherDataTable">
+        <thead>
+        <tr>
+            <th>Humidity(%)</th>
+            <th>Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Rows will be added here autoamticly -->
+        </tbody>
+    </table>
+</div>
+<script>
+    let weather_data = {{ weather_data|safe }};
+    weather_data.sort((a, b) => new Date(b.fields.timestamp) - new Date(a.fields.timestamp));
+
+
+    function addRowToTable(airPres, dateStr) {
+        const date = new Date(dateStr);
+        const formattedDate = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}     ${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+
+        const table = document.getElementById('weatherDataTable').getElementsByTagName('tbody')[0];
+        const newRow = table.insertRow(table.rows.length);
+        newRow.innerHTML = `<td>${airPres}</td><td>${formattedDate}</td>`;
+    }
+
+    weather_data.forEach(data => {
+        addRowToTable(data.fields.humidity, data.fields.timestamp);
+    });
+
+
+    const timestamps = weather_data.map(data => data.fields.timestamp);
+    const humidity = weather_data.map(data => data.fields.humidity);
+    new Chart(document.getElementById('humidityChart'), {
+        type: 'line',
+        data: {
+            labels: timestamps,
+            datasets: [
+                {
+                    label: 'Humidity',
+                    data: humidity,
+                    borderColor: '#3298b7',
+                    fill: true
+                }]
+        },
+        options: {
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'second',
+                        displayFormats: {
+                            second: 'YYYY-MM-DD HH:mm:ss'
+                        },
+                        tooltipFormat: 'll HH:mm'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                },
+                y: {
+                    title: {
+                        position: 'right',
+                        display: true,
+                        text: 'Humidity(%)'
+                    }
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>

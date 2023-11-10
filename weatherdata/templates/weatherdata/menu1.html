@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather Station Menu</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    .header {
+        background-color: #6c7ae0;
+        color: white;
+        padding: 20px;
+        text-align: center;
+
+    }
+    .section-title {
+        text-align: center;
+
+    }
+    .dashboard-container {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 20px;
+        gap: 20px;
+    }
+    .dashboard-title {
+        color: white;
+        font-size: 16px;
+    }
+    .dashboard {
+        background-color: #000000;
+        padding: 20px;
+        width: 200px;
+        margin: 10px;
+        font-size: 30px;
+        text-align: center;
+        color: #ffffff;
+        line-height: 100px;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+        transition: 0.3s;
+        border-radius: 5px;
+    }
+    .dashboard:hover {
+        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    }
+    .link-container {
+        text-align: center;
+        padding: 20px;
+    }
+    .link {
+        text-decoration: none;
+        color: white;
+        background-color: #333;
+        padding: 10px 20px;
+        margin: 10px;
+        border-radius: 5px;
+        display: inline-block;
+        transition: background-color 0.3s ease;
+    }
+    .link:hover {
+        background-color: #555;
+    }
+</style>
+</head>
+<body>
+    <div class="header">
+        <h1>Weather Station Menu</h1>
+    </div>
+    <div class="section-title">
+        <h3>weather data for: {{ current_data.timestamp }}</h3>
+    </div>
+    <div class="dashboard-container">
+        <link href='https://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet' type='text/css'>
+        <div class="dashboard" >
+            <div class="dashboard-title">temperature:</div>
+            <div style="font-family: 'Orbitron', sans-serif;">{{ current_data.temperature }}°C</div>
+        </div>
+        <div class="dashboard" >
+            <div class="dashboard-title">humidity:</div>
+            <div style="font-family: 'Orbitron', sans-serif;">{{ current_data.humidity }}%</div>
+        </div>
+        <div class="dashboard" >
+            <div class="dashboard-title">air pressure:</div>
+            <div style="font-family: 'Orbitron', sans-serif;">{{ current_data.air_pressure }}hPa</div>
+        </div>
+        <div class="dashboard" >
+            <div class="dashboard-title">wind speed:</div>
+            <div style="font-family: 'Orbitron', sans-serif;">{{ current_data.wind_speed }}m/s</div>
+        </div>
+        <div class="dashboard" >
+            <div class="dashboard-title">wind direction:</div>
+            <div style="font-family: 'Orbitron', sans-serif;">{{ current_data.wind_direction }}</div>
+        </div>
+    </div>
+    <div class="section-title">
+        <h3>Data dashboards:</h3>
+    </div>
+    <div class="link-container">
+        <a href="/temperature" class="link">temperature</a>
+        <a href="/humidity" class="link">humidity</a>
+        <a href="/air_pressure" class="link">air pressure</a>
+        <a href="/wind" class="link">wind</a>
+    </div>
+    <div style="float: right; margin: 30px">
+        <div class="section-title">Project by Paweł Korzeniewski</div>
+
+    </div>
+</body>
+</html>
