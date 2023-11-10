@@ -14,26 +14,42 @@ from weatherdata.models import WeatherData
 
 temperature_data = None
 humidity_data = None
+air_pressure_data = None
+wind_speed_data = None
+wind_direction_data = None
 
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
     client.subscribe("weather_station/temperature")
     client.subscribe("weather_station/humidity")
+    client.subscribe("weather_station/air_pressure")
+    client.subscribe("weather_station/wind_speed")
+    client.subscribe("weather_station/wind_direction")
 
 
 def on_message(client, userdata, msg):
-    global temperature_data, humidity_data
+    global temperature_data, humidity_data, air_pressure_data, wind_speed_data, wind_direction_data
     if msg.topic == "weather_station/temperature":
         temperature_data = float(msg.payload)
     elif msg.topic == "weather_station/humidity":
         humidity_data = float(msg.payload)
+    elif msg.topic == "weather_station/air_pressure":
+        air_pressure_data = float(msg.payload)
+    elif msg.topic == "weather_station/wind_speed":
+        wind_speed_data = float(msg.payload)
+    elif msg.topic == "weather_station/wind_direction":
+        wind_direction_data = float(msg.payload)
 
-    if temperature_data is not None and humidity_data is not None:
-        weather_entry = WeatherData(temperature=temperature_data, humidity=humidity_data)
+    if temperature_data is not None and humidity_data is not None and air_pressure_data is not None and wind_speed_data is not None and wind_direction_data is not None :
+        weather_entry = WeatherData(temperature=temperature_data, humidity=humidity_data, air_pressure=air_pressure_data, wind_speed=wind_direction_data, wind_direction=wind_direction_data)
         weather_entry.save()
         temperature_data = None
         humidity_data = None
+        air_pressure_data = None
+        wind_speed_data = None
+        wind_direction_data = None
+
 
 
 if __name__ == "__main__":
