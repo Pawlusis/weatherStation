@@ -43,15 +43,17 @@ def on_message(client, userdata, msg):
     elif msg.topic == "weather_station/wind_direction":
         wind_direction_data = msg.payload.decode("utf-8")
 
-    if temperature_data is not None and humidity_data is not None and air_pressure_data is not None and wind_speed_data is not None and wind_direction_data is not None :
-        weather_entry = WeatherData(temperature=temperature_data, humidity=humidity_data, air_pressure=air_pressure_data, wind_speed=wind_direction_data, wind_direction=wind_direction_data)
+    if temperature_data is not None and humidity_data is not None and air_pressure_data is not None and wind_speed_data is not None and wind_direction_data is not None:
+        weather_entry = WeatherData(temperature=temperature_data, humidity=humidity_data,
+                                    air_pressure=air_pressure_data, wind_speed=wind_speed_data,
+                                    wind_direction=wind_direction_data)
+
         weather_entry.save()
         temperature_data = None
         humidity_data = None
         air_pressure_data = None
         wind_speed_data = None
         wind_direction_data = None
-
 
 
 if __name__ == "__main__":
