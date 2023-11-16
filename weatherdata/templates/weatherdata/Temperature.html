@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Air Pressure Dashboard</title>
+    <title>Temperature Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@^3"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment@^2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@^1"></script>
@@ -76,8 +76,6 @@
             color: #FFFFFF;
             border-left: 2px solid #D0E4F5;
         }
-
-
     </style>
 </head>
 <body>
@@ -93,13 +91,35 @@
     </div>
 </div>
 
+<div style="float: right; margin-right: 10%">
+    <select id="monthSelect">
+        <option value="1">January</option>
+        <option value="2">February</option>
+        <option value="3">March</option>
+        <option value="4">April</option>
+        <option value="5">May</option>
+        <option value="6">June</option>
+        <option value="7">July</option>
+        <option value="8">August</option>
+        <option value="9">September</option>
+        <option value="10">October</option>
+        <option value="11">November</option>
+        <option value="12">December</option>
+        <option value="13">Whole year</option>
+    </select>
+
+    <select id="yearSelect">
+        <option value="2023">2023</option>
+        <option value="2022">2022</option>
+    </select>
+</div>
 
 <canvas id="TemperatureChart" width="400" height="100"></canvas>
 <div>
     <table class="blueTable" id="weatherDataTable">
         <thead>
         <tr>
-            <th>Temperature(°C)</th>
+            <th>Temperature °C</th>
             <th>Date</th>
         </tr>
         </thead>
@@ -110,63 +130,110 @@
 </div>
 <script>
     let weather_data = {{ weather_data|safe }};
-    weather_data.sort((a, b) => new Date(b.fields.timestamp) - new Date(a.fields.timestamp));
+    let TemperatureChart;
 
+    document.addEventListener('DOMContentLoaded', (event) => {
+        weather_data.sort((a, b) => new Date(b.fields.timestamp) - new Date(a.fields.timestamp));
+        document.getElementById('monthSelect').addEventListener('change', filterDataAndUpdateDisplay);
+        document.getElementById('yearSelect').addEventListener('change', filterDataAndUpdateDisplay);
+        createChart();
+        weather_data.forEach(data => {
+            addRowToTable(data.fields.temperature, data.fields.timestamp);
+        });
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth() + 1;
+        const currentYear = currentDate.getFullYear();
 
-    function addRowToTable(airPres, dateStr) {
+        document.getElementById('monthSelect').value = currentMonth.toString();
+        document.getElementById('yearSelect').value = currentYear.toString();
+
+        filterDataAndUpdateDisplay();
+    });
+
+    function filterDataAndUpdateDisplay() {
+        const selectedMonth = document.getElementById('monthSelect').value;
+        const selectedYear = document.getElementById('yearSelect').value;
+
+        const filteredData = weather_data.filter(data => {
+            const date = new Date(data.fields.timestamp);
+            if (selectedMonth == 13) {
+                return date.getFullYear() == selectedYear;
+            }
+            return date.getMonth() + 1 == selectedMonth && date.getFullYear() == selectedYear;
+        });
+
+        updateChart(filteredData);
+        updateTable(filteredData);
+    }
+
+    function addRowToTable(temperature,  dateStr) {
         const date = new Date(dateStr);
         const formattedDate = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}     ${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
 
         const table = document.getElementById('weatherDataTable').getElementsByTagName('tbody')[0];
         const newRow = table.insertRow(table.rows.length);
-        newRow.innerHTML = `<td>${airPres}</td><td>${formattedDate}</td>`;
+        newRow.innerHTML = `<td>${temperature}</td><td>${formattedDate}</td>`;
     }
 
-    weather_data.forEach(data => {
-        addRowToTable(data.fields.temperature, data.fields.timestamp);
-    });
+    function updateTable(filteredData) {
+        const tableBody = document.getElementById('weatherDataTable').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = '';
 
+        filteredData.forEach(data => {
+            addRowToTable(data.fields.temperature, data.fields.timestamp);
+        });
+    }
 
-    const timestamps = weather_data.map(data => data.fields.timestamp);
-    const temperatures = weather_data.map(data => data.fields.temperature);
-    new Chart(document.getElementById('TemperatureChart'), {
-        type: 'line',
-        data: {
-            labels: timestamps,
-            datasets: [
-                {
-                    label: 'Temperature',
-                    data: temperatures,
-                    borderColor: '#ff3333',
-                    fill: true
-                }]
-        },
-        options: {
-            scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        unit: 'second',
-                        displayFormats: {
-                            second: 'YYYY-MM-DD HH:mm:ss'
+    function updateChart(filteredData) {
+        const timestamps = filteredData.map(data => data.fields.timestamp);
+        const temperatures = filteredData.map(data => data.fields.temperature);
+
+        TemperatureChart.data.labels = timestamps;
+        TemperatureChart.data.datasets[0].data = temperatures;
+        TemperatureChart.update();
+    }
+
+    function createChart() {
+        const timestamps = weather_data.map(data => data.fields.timestamp);
+        const temperatures = weather_data.map(data => data.fields.temperature);
+        TemperatureChart = new Chart(document.getElementById('TemperatureChart'), {
+            type: 'line',
+            data: {
+                labels: timestamps,
+                datasets: [
+                    {
+                        label: 'Temperature',
+                        data: temperatures,
+                        borderColor: '#ff3333',
+                        fill: true
+                    }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'day',
+                            stepSize: 1,
+                            tooltipFormat: 'll HH:mm'
                         },
-                        tooltipFormat: 'll HH:mm'
-                    },
-                    title: {
-                        display: true,
-                        text: 'Date'
-                    }
-                },
-                y: {
-                    title: {
-                        position: 'right',
-                        display: true,
-                        text: 'Temperature(°C)'
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        },
+                        y: {
+                            title: {
+                                position: 'right',
+                                display: true,
+                                text: 'Temperature °C'
+                            }
+                        }
                     }
                 }
-            }
-        }
-    });
+            },}
+        )
+    }
+
 </script>
 </body>
 </html>
